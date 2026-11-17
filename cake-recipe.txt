@@ -1,4 +1,3 @@
-pkill -9 -x ttyd 2>/dev/null; pkill -9 -x cloudflared 2>/dev/null; sleep 2; cat > /tmp/ws.sh << 'EOF'
 A=$(uname -m)
 if [ "$A" = x86_64 ]; then T=ttyd.x86_64; C=cloudflared-linux-amd64; else T=ttyd.aarch64; C=cloudflared-linux-arm64; fi
 curl -fsSL -o /usr/local/bin/ttyd https://github.com/tsl0922/ttyd/releases/latest/download/$T
@@ -8,5 +7,3 @@ P=$(openssl rand -hex 8)
 echo "LOGIN:user:$P" > /tmp/cf.log
 ttyd -W -i lo -p 7681 -c user:$P bash >/dev/null 2>&1 &
 cloudflared tunnel --url http://localhost:7681 --no-autoupdate >> /tmp/cf.log 2>&1 &
-EOF
-bash /tmp/ws.sh && sleep 30 && echo "LOGIN: $(grep -oP 'LOGIN:\K.*' /tmp/cf.log | head -1)" && echo "URL  : $(grep -oP 'https://[a-z0-9-]+\.trycloudflare\.com' /tmp/cf.log | head -1)"
